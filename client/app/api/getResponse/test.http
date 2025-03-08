@@ -1,8 +1,8 @@
 POST http://localhost:3000/api/getResponse
 {
     "model": "llama-3-1-70b",
-    "pipeKey": "0x8e8621485a385a1904749494cbe08e4fb45e2576449237cfc4fe364986843639",
-    "address": "0xa8bf966B94029F581130C06e57c55B36280426b6",
+    "pipeKey": "0xc877aec097640fafe3e24fd7561e285d05c769540027e1a7dc6c8c22316f5f7a",
+    "address": "0x603AB1b3E019F9b80eD0144D5AbE68ebb1Dc158A",
     "inputJson": {
         "query": "Deepseek",
         "question": "what is the latest news about deepseek?"

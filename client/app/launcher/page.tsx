@@ -18,8 +18,8 @@ import {
   useDeployContract,
   usePublicClient,
   useWriteContract,
+  useAccount
 } from "wagmi";
-import { useAccount } from "wagmi";
 import {
   abi,
   bytecode,
@@ -707,15 +707,15 @@ function App() {
                   </code>
                 </div>
                 <p className="text-gray-300 mb-4">
-                  View your token contract on Sepolia ArbiScan:
+                  View your token contract on Educhain Explorer:
                 </p>
                 <a
-                  href={`https://sepolia.basescan.org/address/${deployedContractAddress}`}
+                  href={`https://edu-chain-testnet.blockscout.com/address/${deployedContractAddress}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200 mb-4"
                 >
-                  View on ArbiScan
+                  View on Educhain Explorer
                 </a>
                 <button
                   onClick={() => setIsConfirmationModalOpen(false)}

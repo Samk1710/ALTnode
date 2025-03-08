@@ -447,7 +447,7 @@ function Dashboard() {
                       <span className="font-medium text-lg">{option.name}</span>
                       <span className="text-sm text-primary-foreground/70">{option.description}</span>
                       <span className="font-bold mt-1">
-                        {selectedNft ? (selectedNft.price * option.multiplier).toFixed(2) : 0} EDU
+                        {selectedNft ? (selectedNft.price * option.multiplier).toFixed(5) : 0} EDU
                       </span>
                     </Label>
                   </div>
