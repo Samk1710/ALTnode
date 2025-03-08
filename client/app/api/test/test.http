@@ -1,0 +1,7 @@
+POST http://localhost:3000/api/test
+Content-Type: application/json
+
+{
+  "dataKey": "0x332793e2ac38854888d2dc4b2461dd48558c2182feac82105b5f392bf5508645",
+  "address": "0x4B5376dF2927a1f63e9BC09bdEAfcB01888B9A79"
+}
