@@ -8,13 +8,13 @@ import { ArrowDown, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { useGasPrice, useWriteContract } from "wagmi"
-import { arbitrumSepolia } from "wagmi/chains"
+import { educhain } from "../_providers/wagmi"
 import { formatEther } from "viem"
 import { tokenAddress, tokenAbi } from "../abi"
 
 export default function TokenSwap() {
   const { data: gasData, refetch } = useGasPrice({
-    chainId: arbitrumSepolia.id,
+    chainId: educhain.id,
   })
   const [ethAmount, setEthAmount] = useState("")
   const [aitAmount, setAitAmount] = useState("")
