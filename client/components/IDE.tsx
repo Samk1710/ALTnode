@@ -269,8 +269,8 @@ def run(input_json, context=None):
     const pipelineFile = new File([pipelineBlob], `${name}.txt`);
     const pipelineUpload = await pinata.upload.file(pipelineFile);
     const pipelineIpfsUrl = `https://ipfs.io/ipfs/${pipelineUpload.IpfsHash}`;
-    const {ciphertext, dataToEncryptHash} = await encrypt(pipelineIpfsUrl);
-    console.log('encrypted:', ciphertext, dataToEncryptHash);
+    // const {ciphertext, dataToEncryptHash} = await encrypt(pipelineIpfsUrl);
+    // console.log('encrypted:', ciphertext, dataToEncryptHash);
     // const decrypted = await decrypt(encrypted.ciphertext, encrypted.dataToEncryptHash);
     // console.log('decrypted:', decrypted);
     const description = readme + '\n\n' + 'Sample Input:\n' + JSON.stringify(sampleInput, null, 4) + '\n\n' + 'Sample Output:\n' + JSON.stringify(sampleOutput, null, 4);
@@ -281,8 +281,9 @@ def run(input_json, context=None):
       price: price,
       owner: address,
       image: imgIpfsUrl,
-      encryptedPipelineUrl: ciphertext,
-      encryptedKey: dataToEncryptHash,
+      pipeline: pipelineIpfsUrl,
+      // encryptedPipelineUrl: ciphertext,
+      // encryptedKey: dataToEncryptHash,
       attributes: [
         {
           trait_type: 'nft_type',
@@ -299,7 +300,7 @@ def run(input_json, context=None):
     const txHash = await mintAsset(
       address,
       metadataIpfsUrl,
-      ciphertext,
+      pipelineIpfsUrl,
       BigInt(price * 10 ** 18 || 0)
     );
 

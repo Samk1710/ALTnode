@@ -4,6 +4,8 @@ import { LIT_NETWORK } from "@lit-protocol/constants";
 import { accessControlConditions } from "../constants/accesControlConditions";
 
 async function encrypt(message: string) {
+    console.log("Encrypting uri...");
+    console.log("acc", accessControlConditions);
     const client = new LitJsSdk.LitNodeClient({
         alertWhenUnauthorized: false,
         debug: false,
