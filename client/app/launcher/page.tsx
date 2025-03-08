@@ -276,7 +276,7 @@ function App() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <Coins size={16} className="text-purple-400 mr-2" />
-            <span className="text-white">{token.price} ETH</span>
+            <span className="text-white">{token.price} EDU</span>
           </div>
           <div className="flex space-x-2">
             <button

@@ -97,8 +97,8 @@ export default function TokenSwap() {
 
       <Card className="w-full max-w-md bg-opacity-20 bg-purple-900 backdrop-blur-md border border-purple-500/30 text-purple-100 shadow-xl shadow-purple-900/30 relative z-10">
         <CardHeader className="border-b border-purple-500/20 pb-4">
-          <CardTitle className="text-2xl font-bold text-center text-purple-200">Swap ETH for AiT</CardTitle>
-          <CardDescription className="text-center text-purple-300">Exchange Sepolia ETH for AiT tokens</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center text-purple-200">Swap EDU for AiT</CardTitle>
+          <CardDescription className="text-center text-purple-300">Exchange EDU for AiT tokens</CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4">
@@ -114,7 +114,7 @@ export default function TokenSwap() {
                 onChange={(e) => setEthAmount(e.target.value)}
                 className="bg-purple-900/30 border-purple-500/30 text-purple-100 placeholder-purple-400 focus:border-purple-400 focus:ring-purple-400"
               />
-              <div className="text-sm text-purple-300">Sepolia ETH</div>
+              <div className="text-sm text-purple-300">EDU</div>
             </div>
             <div className="flex justify-center">
               <div className="bg-purple-800/50 p-2 rounded-full">
@@ -139,11 +139,11 @@ export default function TokenSwap() {
           <div className="mt-6 text-sm text-purple-300">
             <div className="flex justify-between">
               <span>Exchange rate:</span>
-              <span>1 ETH = {exchangeRate.toLocaleString()} AiT</span>
+              <span>1 EDU = {exchangeRate.toLocaleString()} AiT</span>
             </div>
             <div className="flex justify-between mt-2">
               <span>Estimated gas fee:</span>
-              <span>{gasFee} ETH</span>
+              <span>{gasFee} EDU</span>
             </div>
           </div>
         </CardContent>

@@ -266,7 +266,7 @@ function Dashboard() {
                   <div className="p-4 flex flex-col flex-grow">
                     <h3 className="text-lg font-semibold mb-2">{nft.title}</h3>
                     <p className="text-sm text-primary-foreground/70">Name: {nft.name}</p>
-                    <p className="text-sm text-primary-foreground/70">Price: {nft.price} ETH</p>
+                    <p className="text-sm text-primary-foreground/70">Price: {nft.price} EDU</p>
                     <div className="mt-2 flex justify-between">
                       <Button
                         disabled={nft.owner === address || subscriptions.some((sub: NFT) => sub.tokenId === nft.tokenId)}
@@ -307,7 +307,7 @@ function Dashboard() {
                   <div className="p-4">
                     <h3 className="text-lg font-semibold mb-2">{nft.title}</h3>
                     <p className="text-sm text-primary-foreground/70">Name: {nft.name}</p>
-                    <p className="text-sm text-primary-foreground/70">Price: {nft.price} ETH</p>
+                    <p className="text-sm text-primary-foreground/70">Price: {nft.price} EDU</p>
                     <Button disabled={nft.owner === address} className="z-50" onClick={() => openPurchaseDialog(nft)}>
                       {nft.owner !== address ? `Purchase Subscription` : `Owner`}
                     </Button>
@@ -447,7 +447,7 @@ function Dashboard() {
                       <span className="font-medium text-lg">{option.name}</span>
                       <span className="text-sm text-primary-foreground/70">{option.description}</span>
                       <span className="font-bold mt-1">
-                        {selectedNft ? (selectedNft.price * option.multiplier).toFixed(2) : 0} ETH
+                        {selectedNft ? (selectedNft.price * option.multiplier).toFixed(2) : 0} EDU
                       </span>
                     </Label>
                   </div>

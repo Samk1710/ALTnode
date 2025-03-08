@@ -181,7 +181,7 @@ export default function NFTChatPage() {
                         <div className="grid grid-cols-2 gap-4 mb-4">
                             <div className="bg-gray-800 p-3 rounded-lg">
                                 <p className="text-sm text-gray-400">Price</p>
-                                <p className="text-lg font-medium">{nftData.price} ETH</p>
+                                <p className="text-lg font-medium">{nftData.price} EDU</p>
                             </div>
                             <div className="bg-gray-800 p-3 rounded-lg">
                                 <p className="text-sm text-gray-400">Type</p>

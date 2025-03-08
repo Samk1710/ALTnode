@@ -138,7 +138,7 @@ export default function PipelinePreview({
               />
               <Input
                 type="number"
-                placeholder="Monthly Subscription Price (ETH)"
+                placeholder="Monthly Subscription Price (EDU)"
                 min="0"
                 step="0.01"
                 className="w-full"
