@@ -12,11 +12,7 @@ export default function IDEPage() {
 
   return (<div>
     <IDE />
-    
-    
-    
   </div>
-  
-)
+  )
 }
 
