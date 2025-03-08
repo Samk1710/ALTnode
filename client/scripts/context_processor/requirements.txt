@@ -1,0 +1,4 @@
+langchain
+faiss-cpu
+sentence-transformers
+torch
