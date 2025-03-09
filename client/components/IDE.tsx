@@ -18,6 +18,7 @@ import { useAccount } from "wagmi";
 import { useMintAsset } from "@/functions/useMintNft";
 import { generateCode } from "@/constants/genAI";
 import encrypt from "@/functions/encrypt";
+import NodeBot from "./functions/NodeBot";
 
 const pinata = new PinataSDK({
   pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
@@ -347,98 +348,98 @@ def run(input_json, context=None):
           <br />
           <hr />
           <br />
-            <div className="mt-4 grid grid-cols-2 gap-4">
+          <div className="mt-4 grid grid-cols-2 gap-4">
             <div className="flex flex-col">
               <Textarea
-              value={testInput}
-              onChange={(e) => setTestInput(e.target.value)}
-              placeholder="Enter JSON test input"
-              className="w-full h-24 mb-2 flex-grow"
+                value={testInput}
+                onChange={(e) => setTestInput(e.target.value)}
+                placeholder="Enter JSON test input"
+                className="w-full h-24 mb-2 flex-grow"
               />
               <div className="overflow-auto max-h-20">
-              <ReactJson
-                src={(() => {
-                try {
-                  return JSON.parse(runOutput);
-                } catch (e) {
-                  return {};
-                }
-                })()}
-                theme="summerfruit"
-              />
+                <ReactJson
+                  src={(() => {
+                    try {
+                      return JSON.parse(runOutput);
+                    } catch (e) {
+                      return {};
+                    }
+                  })()}
+                  theme="summerfruit"
+                />
               </div>
             </div>
             <div className="flex flex-col justify-between flex-grow">
               <div className="overflow-auto max-h-64">
-              <ReactJson
-                src={(() => {
-                try {
-                  return JSON.parse(testInput);
-                } catch (e) {
-                  return {};
-                }
-                })()}
-                theme="summerfruit"
-              />
+                <ReactJson
+                  src={(() => {
+                    try {
+                      return JSON.parse(testInput);
+                    } catch (e) {
+                      return {};
+                    }
+                  })()}
+                  theme="summerfruit"
+                />
               </div>
               <div className="flex flex-col items-center">
-              <div className="flex justify-center space-x-4 mb-2">
-                {[0, 1, 2].map((index) => (
-                <motion.div
-                  key={index}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: testsPassed + testsFailed > index ? 1 : 0 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                >
-                  {testsPassed > index ? (
-                  <CheckCircle className="text-green-500 w-8 h-8" />
-                  ) : (
-                  <XCircle className="text-red-500 w-8 h-8" />
-                  )}
-                </motion.div>
-                ))}
-              </div>
-              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                <motion.div
-                className="h-full flex justify-center items-center"
-                initial={{ width: "0%" }}
-                animate={{ width: `${((testsPassed + testsFailed) / 3) * 100}%` }}
-                transition={{ duration: 0.5 }}
-                >
-                <motion.div
-                  className="h-full bg-green-500"
-                  initial={{ width: "0%" }}
-                  animate={{ width: `${(testsPassed / (testsPassed + testsFailed || 1)) * 100}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-                <motion.div
-                  className="h-full bg-red-500"
-                  initial={{ width: "0%" }}
-                  animate={{ width: `${(testsFailed / (testsPassed + testsFailed || 1)) * 100}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-                </motion.div>
-              </div>
-              <div className="text-sm font-semibold mt-2">
-                {testsPassed} Passed / {testsFailed} Failed
-              </div>
+                <div className="flex justify-center space-x-4 mb-2">
+                  {[0, 1, 2].map((index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: testsPassed + testsFailed > index ? 1 : 0 }}
+                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                    >
+                      {testsPassed > index ? (
+                        <CheckCircle className="text-green-500 w-8 h-8" />
+                      ) : (
+                        <XCircle className="text-red-500 w-8 h-8" />
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full flex justify-center items-center"
+                    initial={{ width: "0%" }}
+                    animate={{ width: `${((testsPassed + testsFailed) / 3) * 100}%` }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <motion.div
+                      className="h-full bg-green-500"
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${(testsPassed / (testsPassed + testsFailed || 1)) * 100}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
+                    <motion.div
+                      className="h-full bg-red-500"
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${(testsFailed / (testsPassed + testsFailed || 1)) * 100}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </motion.div>
+                </div>
+                <div className="text-sm font-semibold mt-2">
+                  {testsPassed} Passed / {testsFailed} Failed
+                </div>
               </div>
               <br />
               <Button
-              onClick={handleRunTests}
-              className="bg-secondary text-secondary-foreground hover:bg-secondary/90 w-full font-bold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 mb-2"
-              disabled={isRunningTests || testsPassed === 3}
+                onClick={handleRunTests}
+                className="bg-secondary text-secondary-foreground hover:bg-secondary/90 w-full font-bold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 mb-2"
+                disabled={isRunningTests || testsPassed === 3}
               >
-              {isRunningTests ? (
-                <Loader className="w-5 h-5 animate-spin mr-2" />
-              ) : isTestingComplete ? (
-                'Tests Complete'
-              ) : (
-                'Run Tests'
-              )}
+                {isRunningTests ? (
+                  <Loader className="w-5 h-5 animate-spin mr-2" />
+                ) : isTestingComplete ? (
+                  'Tests Complete'
+                ) : (
+                  'Run Tests'
+                )}
               </Button>
             </div>
-            </div>
+          </div>
           <motion.button
             className="fixed bottom-4 right-10 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-4 shadow-lg transition-all duration-500 ease-in-out transform hover:scale-110 z-50"
             whileHover={{ scale: 1.3 }}
@@ -456,6 +457,7 @@ def run(input_json, context=None):
           isPending={isPending || isConfirming || isuploading}
           testsPassed={testsPassed}
         />
+        <NodeBot />
         <AIGenerationModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
