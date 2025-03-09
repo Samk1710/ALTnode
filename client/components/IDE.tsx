@@ -457,12 +457,18 @@ def run(input_json, context=None):
           isPending={isPending || isConfirming || isuploading}
           testsPassed={testsPassed}
         />
-        <NodeBot />
-        <AIGenerationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onGenerate={handleGenerateAIPipeline}
-        />
+         <motion.div className="fixed bottom-10 right-10 flex space-x-2">
+            <div className="p-40">
+                <NodeBot />
+            </div>
+            <div>
+                <AIGenerationModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onGenerate={handleGenerateAIPipeline}
+                />
+            </div>
+        </motion.div>
       </motion.div>
     </div>
   );

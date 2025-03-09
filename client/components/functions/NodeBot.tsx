@@ -104,7 +104,7 @@ const NodeBot: React.FC = () => {
         <>
             <div className="fixed bottom-10 right-10">
                 <button
-                    className="p-3 rounded-full bg-purple-600 text-white shadow-lg size-16"
+                    className="p-3 rounded-full bg-violet-600 text-white shadow-lg size-16 hover:bg-violet-700 transition"
                     onClick={() => setIsChatboxOpen(!isChatboxOpen)}
                 >
                     <TbMessageChatbot className="size-10 font-black" />
@@ -112,15 +112,15 @@ const NodeBot: React.FC = () => {
             </div>
 
             {isChatboxOpen && (
-                <div className="fixed bottom-28 right-10 w-[400px] dark:bg-slate-950 bg-white shadow-lg rounded-lg p-4 z-50">
+                <div className="fixed bottom-28 right-10 w-[400px] bg-gray-800 shadow-lg rounded-lg p-4 z-50 border border-violet-600">
                     <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2">
-                            <TbMessageChatbot className="size-6 text-purple-600" />
-                            <h2 className="text-lg font-bold">AI Assistant</h2>
+                            <TbMessageChatbot className="size-6 text-violet-400" />
+                            <h2 className="text-lg font-bold text-violet-400">AI Assistant</h2>
                         </div>
                         <button
                             onClick={() => setIsChatboxOpen(false)}
-                            className="text-gray-500 hover:text-gray-800"
+                            className="text-gray-400 hover:text-gray-200"
                         >
                             <XCircleIcon className="w-6 h-6" />
                         </button>
@@ -129,7 +129,7 @@ const NodeBot: React.FC = () => {
                     <div className="h-[400px] mb-4 overflow-hidden">
                         <ScrollArea
                             ref={scrollAreaRef}
-                            className="h-full p-2 dark:bg-gray-900 bg-gray-100 rounded"
+                            className="h-full p-2 bg-gray-700 rounded"
                         >
                             <div className="space-y-4">
                                 {messages.map((message, index) => (
@@ -139,8 +139,8 @@ const NodeBot: React.FC = () => {
                                     >
                                         <div
                                             className={`max-w-[80%] p-3 rounded-lg ${message.role === 'user'
-                                                ? 'bg-purple-600 text-white'
-                                                : 'bg-gray-200 dark:bg-gray-800 dark:text-gray-200'
+                                                ? 'bg-violet-600 text-white'
+                                                : 'bg-violet-900 text-violet-200'
                                                 }`}
                                         >
                                             <ReactMarkdown className="text-sm prose dark:prose-invert max-w-none">
@@ -154,7 +154,7 @@ const NodeBot: React.FC = () => {
                                 ))}
                                 {isLoading && (
                                     <div className="flex justify-start">
-                                        <div className="bg-gray-200 dark:bg-gray-800 p-3 rounded-lg">
+                                        <div className="bg-violet-900 text-violet-200 p-3 rounded-lg">
                                             <p className="text-sm">Thinking...</p>
                                         </div>
                                     </div>
@@ -170,13 +170,13 @@ const NodeBot: React.FC = () => {
                             onChange={(e) => setInputMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
                             placeholder="Type your message..."
-                            className="flex-grow"
+                            className="flex-grow border border-violet-600 bg-gray-700 text-black focus:border-violet-500 focus:ring focus:ring-violet-200"
                             rows={1}
                         />
                         <Button
                             onClick={sendMessage}
                             disabled={isLoading || !inputMessage.trim()}
-                            className="flex-shrink-0"
+                            className="flex-shrink-0 bg-violet-600 text-white hover:bg-violet-700 transition"
                         >
                             <SendIcon className="size-4" />
                         </Button>
