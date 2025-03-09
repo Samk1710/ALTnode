@@ -24,7 +24,7 @@ export const educhain = defineChain({
     default: { name: "OpenCampusCodex", url: "https://opencampus-codex.blockscout.com/" },
   },
   testnet: true,
-});;
+});
 
 const chains: readonly [Chain, ...Chain[]] = [
   educhain,

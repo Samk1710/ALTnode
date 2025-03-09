@@ -102,17 +102,17 @@ const NodeBot: React.FC = () => {
 
     return (
         <>
-            <div className="fixed bottom-10 right-10">
+            <div className="fixed bottom-4 right-28 z-50">
                 <button
-                    className="p-3 rounded-full bg-violet-600 text-white shadow-lg size-16 hover:bg-violet-700 transition"
+                    className="p-3 rounded-full bg-violet-600 text-white shadow-lg size-14 hover:bg-violet-700 transition"
                     onClick={() => setIsChatboxOpen(!isChatboxOpen)}
                 >
-                    <TbMessageChatbot className="size-10 font-black" />
+                    <TbMessageChatbot className="size-8 font-black" />
                 </button>
             </div>
 
             {isChatboxOpen && (
-                <div className="fixed bottom-28 right-10 w-[400px] bg-gray-800 shadow-lg rounded-lg p-4 z-50 border border-violet-600">
+                <div className="fixed bottom-20 right-16 w-[400px] bg-gray-800 shadow-lg rounded-lg p-4 z-50 border border-violet-600">
                     <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2">
                             <TbMessageChatbot className="size-6 text-violet-400" />

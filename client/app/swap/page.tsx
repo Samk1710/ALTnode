@@ -88,7 +88,8 @@ export default function TokenSwap() {
       </div>
 
       <Link
-        href="/"
+        href="#"
+        onClick={() => window.history.back()}
         className="absolute top-4 left-4 bg-opacity-30 bg-purple-900 hover:bg-purple-800 text-purple-200 rounded-full p-2 transition-colors duration-200 z-10"
       >
         <ArrowLeft className="h-6 w-6" />
