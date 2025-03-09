@@ -388,7 +388,7 @@ export default function NFTPage() {
                     <div className="flex flex-col h-full p-6">
                         <div className="mb-6">
                             <h2 className="text-2xl font-bold text-purple-400 mb-2">JSON Query Interface</h2>
-                            <p className="text-gray-300">Submit a JSON query to interact with this NFT's data</p>
+                            <p className="text-gray-300">Submit a JSON query to interact with this NFT&apos;s data</p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow">
