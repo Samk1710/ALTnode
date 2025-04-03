@@ -254,7 +254,7 @@ function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {nfts.length > 0 ? (
               nfts.map((nft: any, index: number) => (
-                <div key={`${nft.id}-${index}`} className="bg-secondary/10 rounded-lg overflow-hidden z-50 flex flex-col justify-between">
+                <div key={`${nft.id}-${index}`} className="bg-secondary/10 rounded-lg overflow-hidden z-30 flex flex-col justify-between">
                   <Image
                     src={nft.image || "/placeholder.svg"}
                     priority={true}

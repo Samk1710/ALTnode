@@ -274,11 +274,16 @@ def run(input_json, context=None):
     // console.log('encrypted:', ciphertext, dataToEncryptHash);
     // const decrypted = await decrypt(encrypted.ciphertext, encrypted.dataToEncryptHash);
     // console.log('decrypted:', decrypted);
-    const description = readme + '\n\n' + 'Sample Input:\n' + JSON.stringify(sampleInput, null, 4) + '\n\n' + 'Sample Output:\n' + JSON.stringify(sampleOutput, null, 4);
+    // const description = readme + '\n\n' + 'Sample Input:\n' + JSON.stringify(sampleInput, null, 4) + '\n\n' + 'Sample Output:\n' + JSON.stringify(sampleOutput, null, 4);
 
+    const description = {
+      readme: readme,
+      sampleInput: sampleInput,
+      sampleOutput: sampleOutput,
+    }
     const metadata = {
       name: name,
-      description: description,
+      description: JSON.stringify(description),
       price: price,
       owner: address,
       image: imgIpfsUrl,

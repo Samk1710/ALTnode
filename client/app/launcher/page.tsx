@@ -169,6 +169,50 @@ function App() {
       },
     ];
   };
+
+  useEffect(() => {
+    if (nftData) {
+      console.log("NFT Data:", nftData);
+
+      const fetchNftMetadata = async () => {
+        try {
+          const parsedData =
+            typeof nftData === "string" ? JSON.parse(nftData) : nftData;
+
+          const updatedNfts = await Promise.all(
+            parsedData.map(async (nft: NFT) => {
+              try {
+                const metadata = await fetchData(nft.tokenUri);
+                return { ...nft, ...metadata }; // Merge metadata with NFT object
+              } catch (error) {
+                console.error(
+                  `Error fetching metadata for tokenUri ${nft.tokenUri}:`,
+                  error
+                );
+                return nft; // Return the NFT object as is if metadata fetch fails
+              }
+            })
+          );
+          console.log("Updated NFTs with metadata: ", updatedNfts);
+          // Filter NFTs by owner address AND nft_type attribute
+          const myNfts = updatedNfts.filter(
+            (nft: NFT) =>
+              nft.owner === address &&
+              nft.attributes?.some(attr => attr.trait_type === "nft_type" && attr.value === "Pipeline"
+              )
+          );
+
+          setAvailableNfts(myNfts);
+        } catch (error) {
+          console.error("Error processing NFT data: ", error);
+        }
+      };
+
+      fetchNftMetadata();
+    }
+  }, [nftData, address]);
+
+
   // Add new useEffect for fetching agent tokens
   useEffect(() => {
     if (address) {
@@ -197,44 +241,6 @@ function App() {
     // Implement sell logic here
   };
 
-  useEffect(() => {
-    if (nftData) {
-      console.log("NFT Data:", nftData);
-
-      const fetchNftMetadata = async () => {
-        try {
-          const parsedData =
-            typeof nftData === "string" ? JSON.parse(nftData) : nftData;
-
-          const updatedNfts = await Promise.all(
-            parsedData.map(async (nft: NFT) => {
-              try {
-                const metadata = await fetchData(nft.tokenUri);
-                return { ...nft, ...metadata }; // Merge metadata with NFT object
-              } catch (error) {
-                console.error(
-                  `Error fetching metadata for tokenUri ${nft.tokenUri}:`,
-                  error
-                );
-                return nft; // Return the NFT object as is if metadata fetch fails
-              }
-            })
-          );
-
-          // console.log("Updated NFTs with metadata: ", updatedNfts);
-          const myNfts = updatedNfts.filter(
-            (nft: NFT) => nft.owner === address
-          );
-          console.log("My NFTs:", myNfts);
-          setAvailableNfts(myNfts);
-        } catch (error) {
-          console.error("Error processing NFT data: ", error);
-        }
-      };
-
-      fetchNftMetadata();
-    }
-  }, [nftData]);
   const getActiveSubscribers = async () => {
     const { data } = await refetch();
     console.log("Active Subscribers for NFT:", data);
@@ -476,7 +482,7 @@ function App() {
                 onClick={() => handleNftClick(nft.tokenId)}
                 className="transform transition-all duration-300 hover:scale-105 cursor-pointer"
               >
-                <div className="bg-gray-800 rounded-xl overflow-hidden border-2 border-purple-500/30 hover:border-purple-500">
+                <div className="bg-gray-800 rounded-xl overflow-hidden border-2 border-purple-500/30 hover:border-purple-500 h-full">
                   <img
                     src={nft.image || "/placeholder.svg"}
                     alt={nft.name}
@@ -486,12 +492,15 @@ function App() {
                     <h3 className="text-xl font-bold text-white mb-2">
                       {nft.name}
                     </h3>
-                    {nft.description.split("\n").map((line, index) => (
-                      <React.Fragment key={index}>
-                        {line}
-                        <br />
-                      </React.Fragment>
-                    ))}
+                    <pre className="text-sm text-purple-300 overflow-auto">
+                      {(() => {
+                        try {
+                          return JSON.stringify(JSON.parse(nft.description), null, 2);
+                        } catch {
+                          return nft.description || "loading...";
+                        }
+                      })()}
+                    </pre>
                   </div>
                 </div>
               </div>

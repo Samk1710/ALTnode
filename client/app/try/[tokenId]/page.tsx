@@ -110,6 +110,7 @@ export default function NFTPage() {
 
     async function fetchNFTData() {
         const metaData = await fetchData(data as string)
+        console.log("Fetched NFT Data:", metaData)
         setNftData(metaData)
     }
 
@@ -231,12 +232,17 @@ export default function NFTPage() {
                         />
 
                         <h3 className="text-xl font-semibold mb-2">{nftData.name}</h3>
-                        <p className="text-gray-300 mb-4">{nftData.description.split("\n").map((line, index) => (
-                            <React.Fragment key={index}>
-                                {line}
-                                <br />
-                            </React.Fragment>
-                        ))}</p>
+                        <div className="text-gray-300 mb-4 bg-gray-800 p-4 rounded-lg">
+                            <pre className="text-sm text-purple-300 overflow-auto">
+                                {(() => {
+                                    try {
+                                        return JSON.stringify(JSON.parse(nftData.description), null, 2);
+                                    } catch {
+                                        return nftData.description || "loading...";
+                                    }
+                                })()}
+                            </pre>
+                        </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-4">
                             <div className="bg-gray-800 p-3 rounded-lg">
@@ -341,7 +347,7 @@ export default function NFTPage() {
                                                     setUploadedFiles(uploadedFiles.filter((_, i) => i !== index))
                                                 }}
                                             >
-                                                
+
                                             </button>
                                         </Badge>
                                     ))}
