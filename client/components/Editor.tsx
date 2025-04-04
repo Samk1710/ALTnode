@@ -26,7 +26,7 @@ export default function Editor({ code, onChange }: EditorProps) {
   }
 
   return (
-    <div className="h-[calc(100vh-24rem)] rounded-2xl overflow-hidden">
+    <div className="h-full rounded-2xl overflow-hidden">
       <MonacoEditor
         height="100%"
         language="python"

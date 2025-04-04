@@ -37,18 +37,19 @@ interface SidebarProps {
     temperature: number;
     maxTokens: number;
   };
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
   onLLMChange: (value: string) => void;
   onParamChange: (param: string, value: number) => void;
 }
 
-export default function Sidebar({ selectedLLM, llmParams, onLLMChange, onParamChange }: SidebarProps) {
-  const [isOpen, setIsOpen] = useState(true);
+export default function Sidebar({ selectedLLM, llmParams, onLLMChange, onParamChange, isOpen, setIsOpen }: SidebarProps) {
 
   return (
     <div className="relative">
       <Button
         variant="ghost"
-        className="absolute top-2 right-2 z-50 text-secondary hover:text-secondary-foreground"
+        className={`absolute top-2 ${isOpen ? 'right-2' : 'left-2'} z-50 text-secondary hover:text-secondary-foreground`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <Menu className="h-6 w-6" />
@@ -56,9 +57,17 @@ export default function Sidebar({ selectedLLM, llmParams, onLLMChange, onParamCh
       {isOpen && (
         <motion.div
           className="w-64 bg-card p-4 overflow-auto"
-          initial={{ x: -50, opacity: 0 }}
+          initial={{ x: -100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
+          exit={{ x: -100, opacity: 0 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 100, 
+            damping: 20,
+            mass: 1.2,
+            opacity: { duration: 0.4 },
+            exit: { duration: 0.6 }
+          }}
         >
           <h2 className="text-lg font-semibold mb-4 text-secondary">LLM Selector</h2>
           <Select value={selectedLLM} onValueChange={onLLMChange}>

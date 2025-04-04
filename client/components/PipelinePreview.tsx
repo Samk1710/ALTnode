@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useState, useRef } from "react"
-import { Upload, ImageIcon, Loader2, ChevronUp, ChevronDown } from 'lucide-react'
+import { Upload, ImageIcon, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
 import dynamic from "next/dynamic"
 import "@uiw/react-md-editor/markdown-editor.css"
 import "@uiw/react-markdown-preview/markdown.css"
@@ -92,13 +92,24 @@ export default function PipelinePreview({
 
   return (
     <motion.div
-      className="w-[450px] bg-card p-4 overflow-auto"
-      initial={{ x: 50, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ delay: 0.3, duration: 0.5 }}
+      className="bg-card p-4 overflow-auto"
+      initial={{ x: 50, opacity: 0, width: 450 }}
+      animate={{ 
+        x: 0, 
+        opacity: 1,
+        width: isCollapsed ? 80 : 450
+      }}
+      transition={{ 
+        delay: 0.3, 
+        duration: 0.5,
+        width: {
+          duration: 0.3,
+          ease: "easeInOut"
+        }
+      }}
     >
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-semibold text-secondary">Generation Engine Config</h1>
+        <h1 className={`text-3xl font-semibold text-secondary ${isCollapsed ? 'hidden' : ''}`}>Generation Engine Config</h1>
         <Button
           onClick={toggleCollapse}
           variant="ghost"
@@ -107,13 +118,11 @@ export default function PipelinePreview({
         >
           {isCollapsed ? (
             <>
-              <ChevronDown className="w-4 h-4 mr-2" />
-              Expand
+              <ChevronLeft className="w-4 h-4 mr-2" />
             </>
           ) : (
             <>
-              <ChevronUp className="w-4 h-4 mr-2" />
-              Collapse
+              <ChevronRight className="w-4 h-4 mr-2" />
             </>
           )}
         </Button>
@@ -243,7 +252,7 @@ export default function PipelinePreview({
                   rows={5}
                 />
               </div>
-              <div>
+              <div className="overflow-auto max-h-32">
                 <ReactJson
                   src={(() => {
                     try {
@@ -269,7 +278,7 @@ export default function PipelinePreview({
                   rows={5}
                 />
               </div>
-              <div>
+              <div className="overflow-auto max-h-32">
                 <ReactJson
                   src={(() => {
                     try {

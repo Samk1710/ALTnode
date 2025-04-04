@@ -105,8 +105,8 @@ function Dashboard() {
       try {
         const parsedData = typeof subscriptionsData === "string" ? JSON.parse(subscriptionsData) : subscriptionsData
 
-        const updatedSubscriptions = await Promise.all(
-          parsedData?.map(async (nft: NFT) => {
+        const updatedSubscriptions = parsedData ? await Promise.all(
+          parsedData.map(async (nft: NFT) => {
             try {
               const metadata = await fetchData(nft.tokenUri)
               return { ...nft, ...metadata } // Merge metadata with NFT object
@@ -114,8 +114,8 @@ function Dashboard() {
               console.error(`Error fetching metadata for tokenUri ${nft.tokenUri}:`, error)
               return nft // Return the NFT object as is if metadata fetch fails
             }
-          }),
-        )
+          })
+        ) : []
 
         console.log("Updated subscribed NFTs with metadata: ", updatedSubscriptions)
         setSubscriptions(updatedSubscriptions)

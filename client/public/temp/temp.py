@@ -15,7 +15,7 @@ def generate(LLM: str, messages: list[dict[str, str]], params: dict=None) -> str
         "stream": False,
     }
     response = requests.post(
-        url="https://api.corcel.io/v1/text/vision/chat",
+        url="https://api.corcel.io/v1/chat/completions",
         headers={
             "accept": "application/json",
             "content-type": "application/json",
@@ -25,7 +25,7 @@ def generate(LLM: str, messages: list[dict[str, str]], params: dict=None) -> str
     )
     if response.status_code != 200:
         return json.dumps({
-            "error": "Beyond API error",
+            "error": "Corcel API error",
             "reason": response.reason
         })
     response = response.json()

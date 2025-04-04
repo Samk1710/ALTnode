@@ -249,7 +249,7 @@ Your response must match the format above. Output only the JSON object with the 
 export const generatePythonScript = async (
     script: string
 ): Promise<string> => {
-    const CORCEL_API_URL = process.env.NEXT_PUBLIC_CORCEL_BASE_URL + "/text/vision/chat";
+    const CORCEL_API_URL = process.env.NEXT_PUBLIC_CORCEL_BASE_URL + "/chat/completions";
     const pythonScript = `import json
 import requests
 
@@ -273,7 +273,7 @@ def generate(LLM: str, messages: list[dict[str, str]], params: dict=None) -> str
     )
     if response.status_code != 200:
         return json.dumps({
-            "error": "Beyond API error",
+            "error": "Corcel API error",
             "reason": response.reason
         })
     response = response.json()

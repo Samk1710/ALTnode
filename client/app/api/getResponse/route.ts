@@ -2,9 +2,10 @@
 
 import { getData, getInhouseScript, getScript } from "@/functions/keyCrypt";
 import { NextRequest, NextResponse } from "next/server";
-import { spawn } from "child_process";
 import fs from "fs/promises";
 import path from "path";
+import { executeContextScript, executePythonScript } from "@/app/lib/utils";
+
 
 async function posthandler(req: NextRequest) {
     let body;
@@ -91,58 +92,6 @@ async function posthandler(req: NextRequest) {
     }
 }
 
-function executePythonScript(scriptPath: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const pythonProcess = spawn("python3", [scriptPath]);
-
-        let output = "";
-        let errorOutput = "";
-
-        pythonProcess.stdout.on("data", (data) => {
-            output += data.toString();
-        });
-
-        pythonProcess.stderr.on("data", (data) => {
-            errorOutput += data.toString();
-        });
-
-        pythonProcess.on("close", (code) => {
-            if (code === 0) {
-                resolve(output.trim());
-            } else {
-                reject(new Error(errorOutput.trim()));
-            }
-        });
-    });
-}
-
-
-function executeContextScript(scriptPath: string, query: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const pythonProcess = spawn("python3", [scriptPath, query]);
-
-        let output = "";
-        let errorOutput = "";
-
-        pythonProcess.stdout.on("data", (data) => {
-            output += data.toString();
-        });
-
-        pythonProcess.stderr.on("data", (data) => {
-            errorOutput += data.toString();
-        });
-
-        pythonProcess.on("close", (code) => {
-            if (code === 0) {
-                output = output.substring(output.indexOf("["), output.lastIndexOf("]") + 1);
-                console.log('Output:', output);
-                resolve(output.trim());
-            } else {
-                reject(new Error(errorOutput.trim()));
-            }
-        });
-    });
-}
 
 async function exists(path: string): Promise<boolean> {
     try {

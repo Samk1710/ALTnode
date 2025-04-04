@@ -61,7 +61,7 @@ export const getScript = async (LLM: string, pipeKey: string, subscriber: string
 }
 
 
-export const getInhouseScript = async (LLM: string): Promise<string> => {
+export const getInhouseScript = async (LLM: string = 'llama-3-1-70b'): Promise<string> => {
     let response = `import json
 import requests
 
@@ -75,7 +75,7 @@ def generate(LLM: str, messages: list[dict[str, str]], params: dict=None) -> str
         "stream": False
     }
     response = requests.post(
-        url="${process.env.NEXT_PUBLIC_CORCEL_BASE_URL}/text/vision/chat",
+        url="${process.env.NEXT_PUBLIC_CORCEL_BASE_URL}/chat/completions",
         headers={
             "accept": "application/json",
             "content-type": "application/json",

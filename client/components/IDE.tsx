@@ -37,6 +37,8 @@ export default function IDE() {
     isConfirmed,
     confirmError,
   } = useMintAsset();
+  const [isOpen, setIsOpen] = useState(true);
+  const [isTestSectionVisible, setIsTestSectionVisible] = useState(true);
   const account = useAccount();
   const address = account ? account.address : undefined;
   const [imgurl, setImgUrl] = useState("");
@@ -342,109 +344,133 @@ def run(input_json, context=None):
           llmParams={llmParams}
           onLLMChange={handleLLMChange}
           onParamChange={handleParamChange}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
         />
         <motion.div
-          className="flex-1 p-4 overflow-auto relative"
+          className={`flex-1 p-4 ${!isOpen ? 'ps-16' : 'ps-0'} overflow-auto relative flex flex-col`}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <Editor code={code} onChange={handleCodeChange} />
-          <br />
-          <hr />
-          <br />
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <div className="flex flex-col">
-              <Textarea
-                value={testInput}
-                onChange={(e) => setTestInput(e.target.value)}
-                placeholder="Enter JSON test input"
-                className="w-full h-24 mb-2 flex-grow"
-              />
-              <div className="overflow-auto max-h-20">
-                <ReactJson
-                  src={(() => {
-                    try {
-                      return JSON.parse(runOutput);
-                    } catch (e) {
-                      return {};
-                    }
-                  })()}
-                  theme="summerfruit"
-                />
-              </div>
-            </div>
-            <div className="flex flex-col justify-between flex-grow">
-              <div className="overflow-auto max-h-64">
-                <ReactJson
-                  src={(() => {
-                    try {
-                      return JSON.parse(testInput);
-                    } catch (e) {
-                      return {};
-                    }
-                  })()}
-                  theme="summerfruit"
-                />
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="flex justify-center space-x-4 mb-2">
-                  {[0, 1, 2].map((index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: testsPassed + testsFailed > index ? 1 : 0 }}
-                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                    >
-                      {testsPassed > index ? (
-                        <CheckCircle className="text-green-500 w-8 h-8" />
-                      ) : (
-                        <XCircle className="text-red-500 w-8 h-8" />
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <motion.div
-                    className="h-full flex justify-center items-center"
-                    initial={{ width: "0%" }}
-                    animate={{ width: `${((testsPassed + testsFailed) / 3) * 100}%` }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <motion.div
-                      className="h-full bg-green-500"
-                      initial={{ width: "0%" }}
-                      animate={{ width: `${(testsPassed / (testsPassed + testsFailed || 1)) * 100}%` }}
-                      transition={{ duration: 0.5 }}
-                    />
-                    <motion.div
-                      className="h-full bg-red-500"
-                      initial={{ width: "0%" }}
-                      animate={{ width: `${(testsFailed / (testsPassed + testsFailed || 1)) * 100}%` }}
-                      transition={{ duration: 0.5 }}
-                    />
-                  </motion.div>
-                </div>
-                <div className="text-sm font-semibold mt-2">
-                  {testsPassed} Passed / {testsFailed} Failed
-                </div>
-              </div>
-              <br />
-              <Button
-                onClick={handleRunTests}
-                className="bg-secondary text-secondary-foreground hover:bg-secondary/90 w-full font-bold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 mb-2"
-                disabled={isRunningTests || testsPassed === 3}
-              >
-                {isRunningTests ? (
-                  <Loader className="w-5 h-5 animate-spin mr-2" />
-                ) : isTestingComplete ? (
-                  'Tests Complete'
-                ) : (
-                  'Run Tests'
-                )}
-              </Button>
-            </div>
+          <div className={`flex-1 ${isTestSectionVisible ? 'h-[calc(100%-300px)]' : 'h-full'} overflow-hidden`}>
+            <Editor code={code} onChange={handleCodeChange} />
           </div>
+          
+          <div className="flex justify-center mt-2 mb-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setIsTestSectionVisible(!isTestSectionVisible)}
+              className="flex items-center gap-1"
+            >
+              {isTestSectionVisible ? 'Hide Tests' : 'Show Tests'}
+              <motion.div
+                animate={{ rotate: isTestSectionVisible ? 0 : 180 }}
+                transition={{ duration: 0.3 }}
+              >
+                ▼
+              </motion.div>
+            </Button>
+          </div>
+          
+          {isTestSectionVisible && (
+            <>
+              <hr />
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="flex flex-col">
+                  <Textarea
+                    value={testInput}
+                    onChange={(e) => setTestInput(e.target.value)}
+                    placeholder="Enter JSON test input"
+                    className="w-full h-24 mb-2 flex-grow"
+                  />
+                  <div className="overflow-auto max-h-20">
+                    <ReactJson
+                      src={(() => {
+                        try {
+                          return JSON.parse(runOutput);
+                        } catch (e) {
+                          return {};
+                        }
+                      })()}
+                      theme="summerfruit"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col justify-between flex-grow">
+                  <div className="overflow-auto max-h-64">
+                    <ReactJson
+                      src={(() => {
+                        try {
+                          return JSON.parse(testInput);
+                        } catch (e) {
+                          return {};
+                        }
+                      })()}
+                      theme="summerfruit"
+                    />
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div className="flex justify-center space-x-4 mb-2">
+                      {[0, 1, 2].map((index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: testsPassed + testsFailed > index ? 1 : 0 }}
+                          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                        >
+                          {testsPassed > index ? (
+                            <CheckCircle className="text-green-500 w-8 h-8" />
+                          ) : (
+                            <XCircle className="text-red-500 w-8 h-8" />
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full flex justify-center items-center"
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${((testsPassed + testsFailed) / 3) * 100}%` }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <motion.div
+                          className="h-full bg-green-500"
+                          initial={{ width: "0%" }}
+                          animate={{ width: `${(testsPassed / (testsPassed + testsFailed || 1)) * 100}%` }}
+                          transition={{ duration: 0.5 }}
+                        />
+                        <motion.div
+                          className="h-full bg-red-500"
+                          initial={{ width: "0%" }}
+                          animate={{ width: `${(testsFailed / (testsPassed + testsFailed || 1)) * 100}%` }}
+                          transition={{ duration: 0.5 }}
+                        />
+                      </motion.div>
+                    </div>
+                    <div className="text-sm font-semibold mt-2">
+                      {testsPassed} Passed / {testsFailed} Failed
+                    </div>
+                  </div>
+                  <br />
+                  <Button
+                    onClick={handleRunTests}
+                    className="bg-secondary text-secondary-foreground hover:bg-secondary/90 w-full font-bold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 mb-2"
+                    disabled={isRunningTests || testsPassed === 3}
+                  >
+                    {isRunningTests ? (
+                      <Loader className="w-5 h-5 animate-spin mr-2" />
+                    ) : isTestingComplete ? (
+                      'Tests Complete'
+                    ) : (
+                      'Run Tests'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
           <motion.button
             className="fixed bottom-4 right-10 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-4 shadow-lg transition-all duration-500 ease-in-out transform hover:scale-110 z-50"
             whileHover={{ scale: 1.3 }}
