@@ -44,3 +44,4 @@ yarn-error.log*
 next-env.d.ts
 
 /public/temp/temp.py
+/temp_script.py

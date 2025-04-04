@@ -15,9 +15,11 @@ import Orb from '@/components/ui/Orb/Orb'
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import ReactMarkdown from "react-markdown"
 import { Label } from "@/components/ui/label"
 import Navbar from "@/components/functions/NavBar"
 import ReactJson from "react-json-view"
+import { FaRobot } from "react-icons/fa6";
 
 interface NFT {
     tokenId: number
@@ -98,6 +100,7 @@ export default function NFTPage() {
         args: [tokenId],
     })
     const [newField, setNewField] = useState({ key: "", value: "" })
+    const [isDatasetType, setIsDatasetType] = useState(false)
 
     // Auto-scroll to bottom of messages
     useEffect(() => {
@@ -109,18 +112,33 @@ export default function NFTPage() {
             fetchNFTData()
             // setJsonInput(JSON.parse(nftData.description).sampleInput)
         }
-    }, [data, tokenId])
+    }, [data, tokenId, nftData, isDatasetType])
+
+    useEffect(() => {
+        if (nftData) {
+            const check = (nftData.attributes.some(
+                (attr: NFTAttribute) => attr.trait_type === "nft_type" && attr.value === "dataset"
+            ))
+            setIsDatasetType(check)
+        }
+    }, [nftData])
 
     async function fetchNFTData() {
         const metaData = await fetchData(data as string)
-        console.log("Fetched NFT Data:", metaData)
-        const parsedDescription = JSON.parse(metaData.description)
-        console.log("Metadata:", parsedDescription)
-        setJsonInput(
-            Object.fromEntries(
-                Object.keys(parsedDescription.sampleInput).map(key => [key, ""])
+        const check = (metaData.attributes.some(
+            (attr: NFTAttribute) => attr.trait_type === "nft_type" && attr.value === "dataset"
+        ))
+
+        setIsDatasetType(check)
+        if (!isDatasetType) {
+            const parsedDescription = JSON.parse(metaData.description)
+            console.log("Metadata:", parsedDescription)
+            setJsonInput(
+                Object.fromEntries(
+                    Object.keys(parsedDescription.sampleInput).map(key => [key, ""])
+                )
             )
-        )
+        }
 
         setNftData(metaData)
     }
@@ -154,17 +172,6 @@ export default function NFTPage() {
         setUserMessageCount(prev => prev + 1)
         const copyInputMessage = inputMessage
         setInputMessage("")
-
-        // Mock response from assistant
-        // setTimeout(() => {
-        //     const responseMessage: Message = {
-        //         id: (Date.now() + 1).toString(),
-        //         content: "I've received your message. How else can I assist you with this NFT?",
-        //         sender: "assistant",
-        //         timestamp: new Date(),
-        //     }
-        //     setMessages((prev) => [...prev, responseMessage])
-        // }, 1000)
 
         const promptWithContext = messages.map(message => {
             return `${message.sender}: ${message.content}`
@@ -232,10 +239,6 @@ export default function NFTPage() {
         return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
     }
 
-    // Determine if we should show the chat interface or JSON interface
-    const isDatasetType = nftData.attributes.some(
-        attr => attr.trait_type === "nft_type" && attr.value === "dataset"
-    )
 
     const handleRemoveField = (fieldKey: keyof JsonInput) => {
 
@@ -358,7 +361,7 @@ export default function NFTPage() {
                                                     </div>
                                                 )}
 
-                                                <p className="whitespace-pre-wrap">{message.content}</p>
+                                                <ReactMarkdown className="prose prose-invert">{message.content}</ReactMarkdown>
 
                                                 {message.attachments && message.attachments.length > 0 && (
                                                     <div className="mt-2 space-y-2">
@@ -380,6 +383,19 @@ export default function NFTPage() {
                                             </div>
                                         </div>
                                     ))}
+
+                                    {isGenerating && (
+                                        <div className="flex justify-start z-50">
+                                            <div className="max-w-[80%] rounded-2xl p-4 bg-gray-700 text-white">
+                                                <div className="flex items-center">
+                                                    <Avatar className="h-6 w-6 mr-2">
+                                                        <div className="bg-purple-500 h-full w-full flex items-center justify-center"><FaRobot /></div>
+                                                    </Avatar>
+                                                    <span>Thinking...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* Message Limit Warning */}
                                     {showLimitMessage && (
@@ -461,7 +477,7 @@ export default function NFTPage() {
                                     <Button
                                         className="h-10 w-10 shrink-0 rounded-full bg-purple-600 hover:bg-purple-700"
                                         onClick={handleSendMessage}
-                                        disabled={userMessageCount >= 5}
+                                        disabled={userMessageCount >= 5 || isGenerating}
                                     >
                                         <Send className="h-5 w-5" />
                                         <span className="sr-only">Send</span>
@@ -606,8 +622,7 @@ export default function NFTPage() {
                                                 <div className="space-y-4">
                                                     <div className="p-3 bg-gray-900 rounded-lg max-h-[calc(100vh-20rem)] overflow-auto">
                                                         <p className="text-xs text-gray-400 mb-2">Full Response:</p>
-                                                        <ReactJson src={jsonOutput.result} theme="chalk" iconStyle="square" enableClipboard={true} displayDataTypes={true} displayObjectSize={true} collapseStringsAfterLength={100} />
-
+                                                        <ReactJson src={jsonOutput?.result || {}} theme="chalk" iconStyle="square" enableClipboard={true} displayDataTypes={true} displayObjectSize={true} collapseStringsAfterLength={100} />
                                                     </div>
                                                 </div>
                                             </ScrollArea>
