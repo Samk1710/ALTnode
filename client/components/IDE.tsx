@@ -272,7 +272,7 @@ def run(input_json, context=None):
     const pipelineFile = new File([pipelineBlob], `${name}.txt`);
     const pipelineUpload = await pinata.upload.file(pipelineFile);
     const pipelineIpfsUrl = `https://ipfs.io/ipfs/${pipelineUpload.IpfsHash}`;
-    // const {ciphertext, dataToEncryptHash} = await encrypt(pipelineIpfsUrl);
+    const {ciphertext, dataToEncryptHash} = await encrypt(pipelineIpfsUrl);
     // console.log('encrypted:', ciphertext, dataToEncryptHash);
     // const decrypted = await decrypt(encrypted.ciphertext, encrypted.dataToEncryptHash);
     // console.log('decrypted:', decrypted);
@@ -289,9 +289,9 @@ def run(input_json, context=None):
       price: price,
       owner: address,
       image: imgIpfsUrl,
-      pipeline: pipelineIpfsUrl,
-      // encryptedPipelineUrl: ciphertext,
-      // encryptedKey: dataToEncryptHash,
+      // pipeline: pipelineIpfsUrl,
+      encryptedAssetUrl: ciphertext,
+      encryptedKey: dataToEncryptHash,
       attributes: [
         {
           trait_type: 'nft_type',

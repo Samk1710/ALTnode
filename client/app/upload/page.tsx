@@ -96,7 +96,7 @@ export default function Home() {
       const datasetUpload = await pinata.upload.file(datasetFile);
       const datasetIpfsUrl = `https://ipfs.io/ipfs/${datasetUpload.IpfsHash}`;
       console.log("Dataset uploaded to IPFS: ", datasetIpfsUrl);
-      // const {ciphertext, dataToEncryptHash} = await encrypt(datasetIpfsUrl);
+      const {ciphertext, dataToEncryptHash} = await encrypt(datasetIpfsUrl);
 
       // Create metadata with the dataset file URL
       const metadata = {
@@ -105,9 +105,9 @@ export default function Home() {
         price: price,
         owner: address,
         image: img,
-        datasetIpfsUrl: datasetIpfsUrl,
-        // encryptedPipelineUrl: ciphertext,
-        // encryptedKey: dataToEncryptHash,
+        // datasetIpfsUrl: datasetIpfsUrl,
+        encryptedAssetUrl: ciphertext,
+        encryptedKey: dataToEncryptHash,
         attributes: [
           {
             trait_type: "nft_type",

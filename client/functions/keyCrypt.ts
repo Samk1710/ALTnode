@@ -22,8 +22,8 @@ export const getData = async (
         const metadata = await response.json();
         // console.log("metadata", metadata);
 
-        // const res = await fetch((await decrypt(metadata.encryptedPipelineUrl, metadata.encryptedKey)).decryptedString);
-        const res = await fetch(metadata.datasetIpfsUrl);
+        const res = await fetch((await decrypt(metadata.encryptedAssetUrl, metadata.encryptedKey)).decryptedString);
+        // const res = await fetch(metadata.datasetIpfsUrl);
         const data = await res.text();
 
         return data;
@@ -47,8 +47,8 @@ export const getScript = async (LLM: string, pipeKey: string, subscriber: string
         const response = await fetch(metadataUrl);
         const metadata = await response.json();
 
-        // const res = await fetch((await decrypt(metadata.encryptedPipelineUrl, metadata.encryptedKey)).decryptedString);
-        const res = await fetch(metadata.pipeline);
+        const res = await fetch((await decrypt(metadata.encryptedAssetUrl, metadata.encryptedKey)).decryptedString);
+        // const res = await fetch(metadata.pipeline);
         const data = await res.text();
 
         const script = `LLM = "${LLM}"\n` + data;

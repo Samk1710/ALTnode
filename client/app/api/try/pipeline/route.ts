@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import * as fs from "fs/promises";
 import { executeContextScript, executePythonScript } from "@/app/lib/utils";
+import { decrypt } from "@/functions/decrypt";
 
 
 async function posthandler(req: NextRequest) {
@@ -15,9 +16,10 @@ async function posthandler(req: NextRequest) {
         return NextResponse.json({ error: `Invalid JSON: ${e}` }, { status: 400 });
     }
 
-    const { pipelineIPFS, inputJson } = body;
+    const { encryptedAssetUrl, encryptedKey, inputJson } = body;
+    const pipeline = await fetch((await decrypt(encryptedAssetUrl, encryptedKey)).decryptedString);
 
-    const pipeline = await fetch(pipelineIPFS);
+    // const pipeline = await fetch(pipelineIPFS);
     let script = `LLM = "llama-3-1-70b"\n` + await pipeline.text();
 
     const data = null;

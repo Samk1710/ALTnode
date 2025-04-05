@@ -5,7 +5,7 @@ deploy:
 	npx hardhat run ignition/modules/AltNode.ts --network eduChain
 
 verify:
-	npx hardhat verify --network eduChain 0x60B543d0835f879F8F7D721Ba45BBb809Bba4a19
+	npx hardhat verify --network eduChain 0x4a0302ad1437DDc60BDEF4ec65a1d8750Ab2940E
 
 deploy-token:
 	npx hardhat run ignition/modules/token.ts --network eduChain

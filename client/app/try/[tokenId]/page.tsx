@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar } from "@/components/ui/avatar"
@@ -21,6 +21,12 @@ import Navbar from "@/components/functions/NavBar"
 import ReactJson from "react-json-view"
 import { FaRobot } from "react-icons/fa6";
 
+// Type definitions
+interface NFTAttribute {
+    trait_type: string
+    value: string | number
+}
+
 interface NFT {
     tokenId: number
     tokenUri: string
@@ -31,17 +37,11 @@ interface NFT {
     image: string
     datasetIpfsUrl?: string
     pipeline?: string
-    encryptedPipelineUrl?: string
+    encryptedAssetUrl?: string
     encryptedKey?: string
     attributes: NFTAttribute[]
 }
 
-interface NFTAttribute {
-    trait_type: string
-    value: string | number
-}
-
-// Message type definition
 type Message = {
     id: string
     content: string
@@ -50,7 +50,6 @@ type Message = {
     attachments?: File[]
 }
 
-// JSON interface types
 interface JsonInput {
     [key: string]: any
 }
@@ -83,182 +82,271 @@ export default function NFTPage() {
         image: "",
         attributes: [],
     })
-    const [jsonInput, setJsonInput] = useState<JsonInput>({
-        question: ""
-    })
+    const [jsonInput, setJsonInput] = useState<JsonInput>({ question: "" })
     const [jsonOutput, setJsonOutput] = useState<JsonOutput | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [isGenerating, setIsGenerating] = useState(false)
     const [userMessageCount, setUserMessageCount] = useState(0)
     const [showLimitMessage, setShowLimitMessage] = useState(false)
+    const [newField, setNewField] = useState({ key: "", value: "" })
+    const [isDatasetType, setIsDatasetType] = useState(false)
+
     const fileInputRef = useRef<HTMLInputElement>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
+
     const { data } = useReadContract({
         address: contractAddress,
         abi: abi,
         functionName: "tokenURI",
         args: [tokenId],
     })
-    const [newField, setNewField] = useState({ key: "", value: "" })
-    const [isDatasetType, setIsDatasetType] = useState(false)
 
     // Auto-scroll to bottom of messages
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [messages])
 
+    // Format description for display
+    const formattedDescription = useMemo(() => {
+        try {
+            return JSON.stringify(JSON.parse(nftData.description), null, 2);
+        } catch {
+            return nftData.description || "loading...";
+        }
+    }, [nftData.description]);
+
+    // Check if NFT is dataset type
+    useEffect(() => {
+        if (nftData.attributes.length > 0) {
+            const isDataset = nftData.attributes.some(
+                (attr) => attr.trait_type === "nft_type" && attr.value === "dataset"
+            );
+            setIsDatasetType(isDataset);
+        }
+    }, [nftData.attributes]);
+
+    // Fetch NFT data when tokenURI is available
     useEffect(() => {
         if (data) {
-            fetchNFTData()
-            // setJsonInput(JSON.parse(nftData.description).sampleInput)
+            fetchNFTData();
         }
-    }, [data, tokenId, nftData, isDatasetType])
+    }, [data]);
 
-    useEffect(() => {
-        if (nftData) {
-            const check = (nftData.attributes.some(
+    const fetchNFTData = useCallback(async () => {
+        try {
+            const metaData = await fetchData(data as string);
+            setNftData(metaData);
+            console.log("NFT Data:", metaData);
+
+            const isDataset = metaData.attributes.some(
                 (attr: NFTAttribute) => attr.trait_type === "nft_type" && attr.value === "dataset"
-            ))
-            setIsDatasetType(check)
+            );
+
+            if (!isDataset && metaData.description) {
+                try {
+                    const parsedDescription = JSON.parse(metaData.description);
+                    if (parsedDescription.sampleInput) {
+                        setJsonInput(
+                            Object.fromEntries(
+                                Object.keys(parsedDescription.sampleInput).map(key => [key, ""])
+                            )
+                        );
+                    }
+                } catch (error) {
+                    console.error("Error parsing description:", error);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching NFT data:", error);
         }
-    }, [nftData])
+    }, [data]);
 
-    async function fetchNFTData() {
-        const metaData = await fetchData(data as string)
-        const check = (metaData.attributes.some(
-            (attr: NFTAttribute) => attr.trait_type === "nft_type" && attr.value === "dataset"
-        ))
+    const fetchData = async (tokenUri: string) => {
+        const res = await fetch(tokenUri);
+        return await res.json();
+    };
 
-        setIsDatasetType(check)
-        if (!isDatasetType) {
-            const parsedDescription = JSON.parse(metaData.description)
-            console.log("Metadata:", parsedDescription)
-            setJsonInput(
-                Object.fromEntries(
-                    Object.keys(parsedDescription.sampleInput).map(key => [key, ""])
-                )
-            )
-        }
+    const handleSendMessage = useCallback(async () => {
+        if ((inputMessage.trim() === "" && uploadedFiles.length === 0) || isGenerating) return;
 
-        setNftData(metaData)
-    }
-
-    async function fetchData(tokenUri: string) {
-        const res = await fetch(tokenUri)
-        const data = await res.json()
-        return data
-    }
-
-    const handleSendMessage = async () => {
-        setIsGenerating(true)
-        if (inputMessage.trim() === "" && uploadedFiles.length === 0) return
-
-        // Check if user has exceeded the message limit
+        // Check user message limit
         if (userMessageCount >= 5) {
-            setShowLimitMessage(true)
-            setIsGenerating(false)
-            return
+            setShowLimitMessage(true);
+            return;
         }
 
-        const newMessage: Message = {
+        setIsGenerating(true);
+
+        const newMessage = {
             id: Date.now().toString(),
             content: inputMessage,
-            sender: "user",
+            sender: "user" as const,
             timestamp: new Date(),
             attachments: uploadedFiles.length > 0 ? [...uploadedFiles] : undefined,
+        };
+
+        // Update messages state with user message
+        setMessages(prev => [...prev, newMessage]);
+        setUserMessageCount(prev => prev + 1);
+
+        const messageContent = inputMessage;
+        setInputMessage("");
+
+        // Prepare context for the API call
+        const promptWithContext = messages
+            .map(msg => `${msg.sender}: ${msg.content}`)
+            .join("\n") + "\n\n" + "user: " + messageContent;
+
+        try {
+            const response = await fetch("/api/try/dataset", {
+                method: "POST",
+                body: JSON.stringify({
+                    encryptedKey: nftData.encryptedKey,
+                    encryptedAssetUrl: nftData.encryptedAssetUrl,
+                    prompt: promptWithContext,
+                    query: messageContent
+                })
+            });
+
+            const data = await response.json();
+
+            // Add response to messages
+            const responseMessage = {
+                id: (Date.now() + 1).toString(),
+                content: data.response,
+                sender: "assistant" as const,
+                timestamp: new Date(),
+            };
+
+            setMessages(prev => [...prev, responseMessage]);
+        } catch (error) {
+            console.error("Error sending message:", error);
+
+            // Add error message
+            const errorMessage = {
+                id: (Date.now() + 1).toString(),
+                content: "Sorry, there was an error processing your request.",
+                sender: "assistant" as const,
+                timestamp: new Date(),
+            };
+
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setUploadedFiles([]);
+            setIsGenerating(false);
         }
+    }, [inputMessage, uploadedFiles, userMessageCount, messages, nftData.datasetIpfsUrl, isGenerating]);
 
-        setMessages((prev) => [...prev, newMessage])
-        setUserMessageCount(prev => prev + 1)
-        const copyInputMessage = inputMessage
-        setInputMessage("")
-
-        const promptWithContext = messages.map(message => {
-            return `${message.sender}: ${message.content}`
-        }).join("\n") + "\n\n" + "user: " + copyInputMessage
-
-        const response = await fetch("/api/try/dataset", {
-            method: "POST",
-            body: JSON.stringify({
-                ipfsUrl: nftData.datasetIpfsUrl,
-                prompt: promptWithContext,
-                query: copyInputMessage
-            })
-        })
-        console.log("Response:", response)
-        const data = await response.json()
-        console.log("Data:", data)
-        const responseMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            content: data.response,
-            sender: "assistant",
-            timestamp: new Date(),
+    const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setUploadedFiles(prev => [...prev, ...Array.from(e.target.files!)]);
         }
-        setMessages((prev) => [...prev, responseMessage])
-        setUploadedFiles([])
-        setIsGenerating(false)
-    }
+    }, []);
 
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const filesArray = Array.from(e.target.files)
-            setUploadedFiles((prev) => [...prev, ...filesArray])
-        }
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault()
-            handleSendMessage()
+            e.preventDefault();
+            handleSendMessage();
         }
-    }
+    }, [handleSendMessage]);
 
-    const handleJsonInputChange = (field: keyof JsonInput, value: string) => {
+    const handleJsonInputChange = useCallback((field: keyof JsonInput, value: string) => {
         setJsonInput(prev => ({
             ...prev,
             [field]: value
-        }))
-    }
+        }));
+    }, []);
 
-    const handleJsonSubmit = async () => {
-        setIsLoading(true)
+    const handleJsonSubmit = useCallback(async () => {
+        setIsLoading(true);
 
-        const response = await fetch("/api/try/pipeline", {
-            method: "POST",
-            body: JSON.stringify({
-                pipelineIPFS: nftData.pipeline,
-                inputJson: jsonInput
-            })
-        })
-        const realResponse: JsonOutput = await response.json()
-        setJsonOutput(realResponse)
-        setIsLoading(false)
-    }
+        try {
+            const response = await fetch("/api/try/pipeline", {
+                method: "POST",
+                body: JSON.stringify({
+                    encryptedKey: nftData.encryptedKey,
+                    encryptedAssetUrl: nftData.encryptedAssetUrl,
+                    inputJson: jsonInput
+                })
+            });
 
-    const truncateAddress = (address: string) => {
-        return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
-    }
+            const data = await response.json();
+            setJsonOutput(data);
+        } catch (error) {
+            console.error("Error submitting JSON:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [nftData.pipeline, jsonInput]);
 
+    const truncateAddress = useCallback((address: string) => {
+        return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+    }, []);
 
-    const handleRemoveField = (fieldKey: keyof JsonInput) => {
+    const handleRemoveField = useCallback((fieldKey: keyof JsonInput) => {
+        setJsonInput(prev => {
+            const newInput = { ...prev };
+            delete newInput[fieldKey];
+            return newInput;
+        });
+    }, []);
 
-        setJsonInput((prev) => {
-            const newInput = { ...prev }
-            delete newInput[fieldKey]
-            return newInput
-        })
-    }
+    const handleAddField = useCallback(() => {
+        if (newField.key.trim() === "") return;
 
-    const handleAddField = () => {
-        if (newField.key.trim() === "") return
-
-        setJsonInput((prev) => ({
+        setJsonInput(prev => ({
             ...prev,
             [newField.key]: newField.value,
-        }))
+        }));
 
-        setNewField({ key: "", value: "" })
-    }
+        setNewField({ key: "", value: "" });
+    }, [newField]);
+
+    const resetChat = useCallback(() => {
+        setMessages([]);
+        setUserMessageCount(0);
+        setShowLimitMessage(false);
+    }, []);
+
+    const nftType = useMemo(() => {
+        return nftData.attributes.find(attr => attr.trait_type === "nft_type")?.value || "Unknown";
+    }, [nftData.attributes]);
+
+    // Message rendering function
+    const renderMessage = useCallback((message: Message) => (
+        <div key={message.id} className={`flex z-50 ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[80%] rounded-2xl p-4 ${message.sender === "user" ? "bg-purple-600 text-white" : "bg-gray-700 text-white"}`}>
+                {message.sender === "assistant" && (
+                    <div className="flex items-center mb-2">
+                        <Avatar className="h-6 w-6 mr-2">
+                            <div className="bg-purple-500 h-full w-full flex items-center justify-center">AI</div>
+                        </Avatar>
+                        <span className="text-sm font-medium">Assistant</span>
+                    </div>
+                )}
+
+                <ReactMarkdown className="prose prose-invert">{message.content}</ReactMarkdown>
+
+                {message.attachments && message.attachments.length > 0 && (
+                    <div className="mt-2 space-y-2">
+                        {message.attachments.map((file, index) => (
+                            <div key={index} className="flex items-center bg-gray-800/50 p-2 rounded">
+                                <FileText className="h-4 w-4 mr-2 text-purple-300" />
+                                <span className="text-sm truncate">{file.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <div className="text-xs opacity-70 mt-1 text-right">
+                    {message.timestamp.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })}
+                </div>
+            </div>
+        </div>
+    ), []);
 
     return (
         <>
@@ -279,13 +367,7 @@ export default function NFTPage() {
                             <h3 className="text-xl font-semibold mb-2">{nftData.name}</h3>
                             <div className="text-gray-300 mb-4 bg-gray-800 p-4 rounded-lg">
                                 <pre className="text-sm text-purple-300 overflow-auto">
-                                    {(() => {
-                                        try {
-                                            return JSON.stringify(JSON.parse(nftData.description), null, 2);
-                                        } catch {
-                                            return nftData.description || "loading...";
-                                        }
-                                    })()}
+                                    {formattedDescription}
                                 </pre>
                             </div>
 
@@ -297,7 +379,7 @@ export default function NFTPage() {
                                 <div className="bg-gray-800 p-3 rounded-lg">
                                     <p className="text-sm text-gray-400">Type</p>
                                     <p className="text-lg font-medium capitalize">
-                                        {nftData.attributes.find(attr => attr.trait_type === "nft_type")?.value || "Unknown"}
+                                        {nftType}
                                     </p>
                                 </div>
                             </div>
@@ -314,11 +396,7 @@ export default function NFTPage() {
                                 <Button
                                     variant="outline"
                                     className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                                    onClick={() => {
-                                        setMessages([]);
-                                        setUserMessageCount(0);
-                                        setShowLimitMessage(false);
-                                    }}
+                                    onClick={resetChat}
                                 >
                                     Clear Chat
                                 </Button>
@@ -347,42 +425,7 @@ export default function NFTPage() {
                             {/* Messages Area */}
                             <ScrollArea className="flex-grow p-6">
                                 <div className="space-y-4">
-                                    {messages.map((message) => (
-                                        <div key={message.id} className={`flex z-50 ${message.sender === "user" ? "justify-end" : "justify-start"}`}>
-                                            <div
-                                                className={`max-w-[80%] rounded-2xl p-4 ${message.sender === "user" ? "bg-purple-600 text-white" : "bg-gray-700 text-white"}`}
-                                            >
-                                                {message.sender === "assistant" && (
-                                                    <div className="flex items-center mb-2">
-                                                        <Avatar className="h-6 w-6 mr-2">
-                                                            <div className="bg-purple-500 h-full w-full flex items-center justify-center">AI</div>
-                                                        </Avatar>
-                                                        <span className="text-sm font-medium">Assistant</span>
-                                                    </div>
-                                                )}
-
-                                                <ReactMarkdown className="prose prose-invert">{message.content}</ReactMarkdown>
-
-                                                {message.attachments && message.attachments.length > 0 && (
-                                                    <div className="mt-2 space-y-2">
-                                                        {message.attachments.map((file, index) => (
-                                                            <div key={index} className="flex items-center bg-gray-800/50 p-2 rounded">
-                                                                <FileText className="h-4 w-4 mr-2 text-purple-300" />
-                                                                <span className="text-sm truncate">{file.name}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-
-                                                <div className="text-xs opacity-70 mt-1 text-right">
-                                                    {message.timestamp.toLocaleTimeString([], {
-                                                        hour: "2-digit",
-                                                        minute: "2-digit",
-                                                    })}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                    {messages.map(renderMessage)}
 
                                     {isGenerating && (
                                         <div className="flex justify-start z-50">
@@ -440,7 +483,6 @@ export default function NFTPage() {
                                                         setUploadedFiles(uploadedFiles.filter((_, i) => i !== index))
                                                     }}
                                                 >
-
                                                 </button>
                                             </Badge>
                                         ))}
@@ -570,7 +612,7 @@ export default function NFTPage() {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleRemoveField(key as keyof JsonInput)}
-                                                        className={`h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20`}
+                                                        className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
@@ -622,7 +664,15 @@ export default function NFTPage() {
                                                 <div className="space-y-4">
                                                     <div className="p-3 bg-gray-900 rounded-lg max-h-[calc(100vh-20rem)] overflow-auto">
                                                         <p className="text-xs text-gray-400 mb-2">Full Response:</p>
-                                                        <ReactJson src={jsonOutput?.result || {}} theme="chalk" iconStyle="square" enableClipboard={true} displayDataTypes={true} displayObjectSize={true} collapseStringsAfterLength={100} />
+                                                        <ReactJson
+                                                            src={jsonOutput?.result || {}}
+                                                            theme="chalk"
+                                                            iconStyle="square"
+                                                            enableClipboard={true}
+                                                            displayDataTypes={true}
+                                                            displayObjectSize={true}
+                                                            collapseStringsAfterLength={100}
+                                                        />
                                                     </div>
                                                 </div>
                                             </ScrollArea>
@@ -639,7 +689,6 @@ export default function NFTPage() {
                                 </Card>
                             </div>
                         </div>
-
                     )}
                 </div>
             </div>

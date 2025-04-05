@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import * as fs from "fs/promises";
 import { executeContextScript, executePythonScript } from "@/app/lib/utils";
+import { decrypt } from "@/functions/decrypt";
 
 
 export async function POST(request: NextRequest) {
@@ -15,9 +16,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: `Invalid JSON: ${e}` }, { status: 400 });
     }
 
-    const { ipfsUrl, prompt, query } = body;
+    const { encryptedKey, encryptedAssetUrl, prompt, query } = body;
+    // const decryptedResponse = await decrypt(encryptedAssetUrl, encryptedKey);
+    const data = await fetch((await decrypt(encryptedAssetUrl, encryptedKey)).decryptedString);
 
-    const data = await fetch(ipfsUrl);
     const dataText = await data.text();
 
     let script = await getInhouseScript();
