@@ -1,8 +1,8 @@
 POST http://localhost:3000/api/getResponse
 {
     "model": "llama-3-1-70b",
-    "pipeKey": "0x0f9da2be6d3e7226a312c503bdf9ca9c12edeff288fe3412c1d9cfc6e09a2afa",
-    "address": "0x945319c475F1e20048E390D99e80972143bb8552",
+    "pipeKey": "0xd00508004cec837a3c540eb449b203551c304a13254487d132e385e034f77e18",
+    "address": "0xcaA2475b077926173043A91dd47e57f8F50a2926",
     "inputJson": {
         "query": "Deepseek",
         "question": "what is the latest news about deepseek?"
@@ -12,6 +12,6 @@ POST http://localhost:3000/api/getResponse
 HTTP/1.1 200  - OK
 vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
 content-type: application/json
-date: Sat, 05 Apr 2025 16:37:11 GMT
+date: Sun, 06 Apr 2025 12:46:34 GMT
 connection: close
 transfer-encoding: chunked
