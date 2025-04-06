@@ -450,7 +450,7 @@ export default function NFTPage() {
                                                     </Avatar>
                                                     <span className="text-sm font-medium">Message Limit Reached</span>
                                                 </div>
-                                                <p className="mb-4">You've reached the limit of 5 trial messages. To continue using this NFT, please purchase it.</p>
+                                                <p className="mb-4">You&apos;ve reached the limit of 5 trial messages. To continue using this NFT, please purchase it.</p>
                                                 <Button
                                                     className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                                                     onClick={() => window.location.href = `/buy/${tokenId}`}
