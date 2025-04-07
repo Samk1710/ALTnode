@@ -26,22 +26,6 @@ export const educhain = defineChain({
   testnet: true,
 });
 
-// const chains: readonly [Chain, ...Chain[]] = [
-//   educhain,
-// ];
-
-// export const config = createConfig({
-//   chains: [educhain],
-//   storage: createStorage({
-//     storage: cookieStorage,
-//   }),
-//   transports: {
-//     [educhain.id]: http(),
-//   },
-//   appName: "Your App Name",
-//   ssr: false,
-// });
-
 export const config = createConfig(
   getDefaultConfig({
     enableFamily: false,
