@@ -1,9 +1,9 @@
 "use client";
 
-import { createConfig } from "@privy-io/wagmi";
-import { Chain } from "wagmi/chains";
-import { http, createStorage, cookieStorage } from "wagmi"
+import { createConfig, http } from "wagmi";
 import { defineChain } from "viem";
+import { cookieStorage, createStorage } from "wagmi";
+import { getDefaultConfig } from "connectkit";
 
 export const educhain = defineChain({
   id: 656476,
@@ -26,17 +26,43 @@ export const educhain = defineChain({
   testnet: true,
 });
 
-const chains: readonly [Chain, ...Chain[]] = [
-  educhain,
-];
+// const chains: readonly [Chain, ...Chain[]] = [
+//   educhain,
+// ];
 
-export const config = createConfig({
-  chains,
-  storage: createStorage({
-    storage: cookieStorage,
-  }),
-  transports: {
-    [educhain.id]: http(),
-  },
-  ssr: false,
-});
+// export const config = createConfig({
+//   chains: [educhain],
+//   storage: createStorage({
+//     storage: cookieStorage,
+//   }),
+//   transports: {
+//     [educhain.id]: http(),
+//   },
+//   appName: "Your App Name",
+//   ssr: false,
+// });
+
+export const config = createConfig(
+  getDefaultConfig({
+    enableFamily: false,
+    chains: [educhain],
+    transports: {
+      // RPC URL for each chain
+      [educhain.id]: http(),
+    },
+    storage: createStorage({
+      storage: cookieStorage,
+    }),
+
+    // Required API Keys
+    walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "default_project_id",
+
+    // Required App Info
+    appName: "AltNode",
+
+    // Optional App Info
+    appDescription: "Decentralised AI Ecosystem",
+    // appUrl: "https://family.co", // your app's url
+    // appIcon: "https://family.co/logo.png",
+  })
+);

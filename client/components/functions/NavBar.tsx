@@ -3,10 +3,36 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import LoginButton from "./ConnectButton"
+import { ConnectKitButton } from "connectkit"
+import { useAccount, useReadContract } from "wagmi"
+import { tokenAbi, tokenAddress } from "@/app/abi"
+import { formatEther } from "viem"
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { isConnected, address } = useAccount()
+  
+  // Safe contract read with error handling
+  const { data: tokenBalance } = useReadContract({
+    abi: tokenAbi,
+    address: tokenAddress,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    // enabled: !!address, // Only run query when address is available
+  })
+
+  // Format balance with proper error handling
+  const getFormattedBalance = () => {
+    try {
+      if (!tokenBalance || !isConnected || typeof tokenBalance !== 'bigint') return "0.00"
+      return Number(formatEther(tokenBalance)).toFixed(2)
+    } catch (error) {
+      console.error("Error formatting balance:", error)
+      return "0.00"
+    }
+  }
+
+  const formattedBalance = getFormattedBalance()
 
   const navItems = [
     { name: "Build Agent", href: "/ide" },
@@ -38,7 +64,7 @@ export default function Navbar() {
         </Link>
 
         {/* Menu Items for Desktop */}
-        <div className="md:flex space-x-4 items-center justify-center flex-grow">
+        <div className="hidden md:flex space-x-4 items-center justify-center flex-grow">
           {navItems.map((item) => (
             <Link
               key={item.name}
@@ -51,13 +77,24 @@ export default function Navbar() {
         </div>
 
         {/* Right-aligned buttons */}
-        <div className="md:flex items-center space-x-4">
-          {/* <ConnectButton /> */}
-          <LoginButton />
+        <div className="hidden md:flex items-center space-x-4">
+          {/* Token Balance Display */}
+          {isConnected && (
+            <div className="text-foreground font-medium px-2 py-1 rounded bg-background/50 border border-border">
+              {formattedBalance} AiT
+            </div>
+          )}
+          <ConnectKitButton showBalance={false} />
         </div>
 
         {/* Hamburger Button for Mobile & Tablet */}
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center space-x-4">
+          {/* Token Balance Display for Mobile */}
+          {isConnected && (
+            <div className="text-foreground font-medium text-sm px-2 py-1 rounded bg-background/50 border border-border">
+              {formattedBalance} AiT
+            </div>
+          )}
           <button
             onClick={toggleMenu}
             className="text-foreground font-semibold hover:text-secondary transition-all"
@@ -80,10 +117,9 @@ export default function Navbar() {
               {item.name}
             </Link>
           ))}
-          <LoginButton />
+          <ConnectKitButton />
         </div>
       )}
     </motion.nav>
   )
 }
-
