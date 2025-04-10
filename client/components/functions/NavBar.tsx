@@ -52,7 +52,7 @@ export default function Navbar() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-background py-4 px-6 sticky top-0 z-20 border-b border-border"
+      className="bg-background py-4 px-6 sticky top-0 z-50 border-b border-border"
     >
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}

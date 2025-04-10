@@ -254,14 +254,14 @@ function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {nfts.length > 0 ? (
               nfts.map((nft: any, index: number) => (
-                <div key={`${nft.id}-${index}`} className="bg-secondary/10 rounded-lg overflow-hidden z-30 flex flex-col justify-between">
+                <div key={`${nft.id}-${index}`} className="bg-secondary/10 rounded-lg overflow-hidden z-10 flex flex-col justify-between">
                   <Image
                     src={nft.image || "/placeholder.svg"}
                     priority={true}
                     alt="NFT Image"
                     width={400}
                     height={400}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48 object-cover z-20"
                   />
                   <div className="p-4 flex flex-col flex-grow">
                     <h3 className="text-lg font-semibold mb-2">{nft.title}</h3>
@@ -295,14 +295,14 @@ function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {myNfts.length > 0 ? (
               myNfts.map((nft: any, index: number) => (
-                <div key={`${nft.id}-${index}`} className="bg-secondary/10 rounded-lg overflow-hidden z-50">
+                <div key={`${nft.id}-${index}`} className="bg-secondary/10 rounded-lg overflow-hidden z-20">
                   <Image
                     src={nft.image || "/placeholder.svg"}
                     priority={true}
                     alt="NFT Image"
                     width={400}
                     height={400}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48 object-cover z-20"
                   />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold mb-2">{nft.title}</h3>
@@ -368,7 +368,7 @@ function Dashboard() {
 
       <div className="min-h-[89svh] bg-background text-primary-foreground flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-secondary/10 p-6 md:block z-50 sticky">
+        <aside className="w-64 bg-secondary/10 p-6 md:block z-30 sticky">
           <div className="flex items-center mb-8">
             <img src="https://yudiz.com/codepen/nft-store/logo-icon.svg" alt="logo" className="w-8 h-8 mr-2" />
             <span className="text-xl font-bold">NFT Store</span>
