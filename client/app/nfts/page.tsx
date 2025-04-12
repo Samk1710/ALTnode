@@ -56,6 +56,7 @@ function Dashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedNft, setSelectedNft] = useState<any>(null)
   const [selectedDuration, setSelectedDuration] = useState<string>("monthly")
+  const [searchQuery, setSearchQuery] = useState<string>("")
 
   const subscriptionOptions: SubscriptionOption[] = [
     {
@@ -248,12 +249,27 @@ function Dashboard() {
   }
 
   const renderContent = () => {
+    // Filter NFTs based on search query
+    const filterNfts = (items: any[]) => {
+      if (!searchQuery.trim()) return items;
+      
+      return items.filter((nft) => {
+        const searchLower = searchQuery.toLowerCase();
+        return (
+          (nft.title && nft.title.toLowerCase().includes(searchLower)) ||
+          (nft.name && nft.name.toLowerCase().includes(searchLower)) ||
+          (nft.description && nft.description.toLowerCase().includes(searchLower))
+        );
+      });
+    };
+
     switch (activeTab) {
       case "marketplace":
+        const filteredNfts = filterNfts(nfts);
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {nfts.length > 0 ? (
-              nfts.map((nft: any, index: number) => (
+            {filteredNfts.length > 0 ? (
+              [...filteredNfts].reverse().map((nft: any, index: number) => (
                 <div key={`${nft.id}-${index}`} className="bg-secondary/10 rounded-lg overflow-hidden z-10 flex flex-col justify-between">
                   <Image
                     src={nft.image || "/placeholder.svg"}
@@ -291,10 +307,11 @@ function Dashboard() {
         )
 
       case "my-nfts":
+        const filteredMyNfts = filterNfts(myNfts);
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {myNfts.length > 0 ? (
-              myNfts.map((nft: any, index: number) => (
+            {filteredMyNfts.length > 0 ? (
+              filteredMyNfts.map((nft: any, index: number) => (
                 <div key={`${nft.id}-${index}`} className="bg-secondary/10 rounded-lg overflow-hidden z-20">
                   <Image
                     src={nft.image || "/placeholder.svg"}
@@ -320,10 +337,11 @@ function Dashboard() {
           </div>
         )
       case "my-subscriptions":
+        const filteredSubscriptions = filterNfts(subscriptions);
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {subscriptions.length > 0 ? (
-              subscriptions.map((nft: any, index: number) => (
+            {filteredSubscriptions.length > 0 ? (
+              filteredSubscriptions.map((nft: any, index: number) => (
                 <div key={`${nft.id}-${index}`} className="bg-secondary/10 rounded-lg overflow-hidden z-50">
                   <Image
                     src={nft.image || "/placeholder.svg"}
@@ -368,16 +386,16 @@ function Dashboard() {
 
       <div className="min-h-[89svh] bg-background text-primary-foreground flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-secondary/10 p-6 md:block z-30 sticky">
+        <aside className="w-64 bg-secondary/10 p-6 md:block z-30 sticky top-[70px] h-[calc(100vh-70px)] overflow-y-auto">
           <div className="flex items-center mb-8">
             <img src="https://yudiz.com/codepen/nft-store/logo-icon.svg" alt="logo" className="w-8 h-8 mr-2" />
-            <span className="text-xl font-bold">NFT Store</span>
+            <span className="text-xl font-bold">Agent Store</span>
           </div>
           <nav>
             <ul className="space-y-2">
               {[
                 { icon: Briefcase, label: "Marketplace", id: "marketplace" },
-                { icon: Heart, label: "My NFTs", id: "my-nfts" },
+                { icon: Heart, label: "My Agents", id: "my-nfts" },
                 {
                   icon: Square,
                   label: "My Subscriptions",
@@ -402,27 +420,29 @@ function Dashboard() {
         {/* Main content */}
         <main className="flex-1 p-6">
           {/* Header */}
-          <header className="flex justify-between items-center mb-8">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search"
-                className="pl-10 pr-4 py-2 rounded-full bg-secondary/10 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-foreground/50" />
-            </div>
-            <div className="flex items-center space-x-4"></div>
-          </header>
 
           {/* Content */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-4">
-              {activeTab === "marketplace"
-                ? "NFT Marketplace"
-                : activeTab === "my-nfts"
-                  ? "My NFTs"
-                  : "My Subscriptions"}
-            </h1>
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-3xl font-bold">
+                {activeTab === "marketplace"
+                  ? "AI Agent Engine Marketplace"
+                  : activeTab === "my-nfts"
+                    ? "My Agents"
+                    : "My Subscriptions"}
+              </h1>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="pl-10 pr-4 py-2 rounded-full bg-secondary/10 focus:outline-none focus:ring-2 focus:ring-primary"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-foreground/50" />
+              </div>
+            </div>
+            
             {renderContent()}
           </div>
         </main>
