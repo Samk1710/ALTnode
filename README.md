@@ -1,10 +1,6 @@
 # AITnode: Decentralized AI Agent Marketplace
 
-## Overview
 AITnode is a next-generation AI and Web3 platform that enables users to build, own, and monetize AI agents as NFTs on the EDU-CHAIN blockchain.
-
-### Hackathon
-EDU Chain Hackathon: Semester 3 - ALTnode
 
 ### Videos
 - [Demo Video](#) https://youtu.be/G2mDFYeZn0Q
